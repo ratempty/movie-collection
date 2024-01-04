@@ -16,6 +16,10 @@
         margin: 0;
         padding: 0;
       }
+      a {
+        text-decoration: none;
+        color: #39caff;
+      }
       body {
         font-family: "Pretendard-Regular";
         font-size: 16px;
@@ -111,12 +115,57 @@
         transition: all 0.5s;
         text-align: justify;
         background: rgba(0, 0, 0, 0.8);
+        cursor: pointer;
+      }
+      .card .more {
+        position: absolute;
+        right: 30px;
+        bottom: 30px;
       }
       .card:hover .overview {
         opacity: 1;
       }
       .card:hover img {
         transform: scale(1);
+      }
+      .bg {
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 999;
+        display: none;
+      }
+      .modal {
+        position: fixed;
+        left: 50%;
+        top: 150%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        height: auto;
+        background: #fff;
+        z-index: 9999;
+        border-radius: 20px;
+        padding: 100px;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        gap: 30px;
+        transition: all 0.5s;
+      }
+      .modal .closeBtn {
+        position: fixed;
+        right: 30px;
+        bottom: 30px;
+        width: 50px;
+        height: 30px;
+        border-radius: 20px;
+        background: #222;
+        color: #fff;
+        border: 0 none;
+        cursor: pointer;
       }
     </style>
   </head>
@@ -135,9 +184,23 @@
         </div>
       </div>
     </header>
-    <section id="section"></section>
+    <section id="section">
+      <div class="modal">
+        <p>제목 : <span class="motitle"></span></p>
+        <p>장르 : <span class="mogenres"></span></p>
+        <p>개봉일 : <span class="modate"></span></p>
+        <p>런타임 : <span class="moruntime"></span>분</p>
+        <p>평점 : <span class="movote"></span></p>
+        <p class="page">
+          홈페이지 :
+          <a href="" class="mohomepage" target="_blank"></a>
+        </p>
+        <button class="closeBtn">닫기</button>
+      </div>
+      <div class="bg"></div>
+    </section>
     <script>
-      // api 받아오기 , card에 삽입
+      // api 받아오기
       const options = {
         method: "GET",
         headers: {
@@ -165,13 +228,17 @@
                 options
               )
                 .then((response) => response.json())
-                .then((response) => console.log(response))
+                .then((response) => {
+                  modalLoad(response);
+                  openModal(response);
+                })
                 .catch((err) => console.error(err));
             });
           });
           input.focus();
         })
         .catch((err) => console.error(err));
+      //카드 생성함수
       const makeCard = (movie) => {
         const section = document.getElementById("section");
         const card = `
@@ -179,11 +246,58 @@
           <img src="https://image.tmdb.org/t/p/w500/${movie.poster_path}" alt="" />
           <h2 class="title">${movie.title}</h2>
           <p class="rating">Rating : ${movie.vote_average}</p>
-          <p class="overview">${movie.overview}</p>
+          <p class="overview">
+            ${movie.overview}
+            <span class='more'>더 알아보기</span>
+          </p>
         </div>
         `;
         section.innerHTML += card;
       };
+      // 모달창 로드
+      const modalLoad = (movie) => {
+        let title = document.querySelector(".motitle");
+        let genres = document.querySelector(".mogenres");
+        let date = document.querySelector(".modate");
+        let runTime = document.querySelector(".moruntime");
+        let vote = document.querySelector(".movote");
+        let homepage = document.querySelector(".mohomepage");
+        let hpage = document.querySelector(".page");
+        let genre = [];
+        for (let i = 0; i < movie.genres.length; i++) {
+          genre.push(movie.genres[i].name);
+        }
+        if (!movie.homepage) {
+          hpage.style.display = "none";
+        }
+        title.innerHTML = movie.title;
+        genres.innerHTML = genre.join(",");
+        date.innerHTML = movie.release_date;
+        runTime.innerHTML = movie.runtime;
+        vote.innerHTML = movie.vote_average;
+        homepage.innerHTML = movie.homepage;
+        homepage.setAttribute("href", movie.homepage);
+      };
+      // 모달창 열기 함수
+      const openModal = (movie) => {
+        const modal = document.querySelector(".modal");
+        const bg = document.querySelector(".bg");
+        modal.style.top = "50%";
+        bg.style.display = "block";
+      };
+      // 모달창 닫기
+      const closeBtn = document.querySelector(".closeBtn");
+      section.addEventListener("click", (e) => {
+        if (
+          e.target.classList.contains("closeBtn") ||
+          e.target.classList.contains("bg")
+        ) {
+          const modal = document.querySelector(".modal");
+          const bg = document.querySelector(".bg");
+          modal.style.top = "150%";
+          bg.style.display = "none";
+        }
+      });
       // 검색기능
       const btn = document.getElementById("searchBtn");
       const input = document.getElementById("search");

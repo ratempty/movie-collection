@@ -1,3 +1,5 @@
+//========================================================
+// 전역변수
 // api 받아오기
 const options = {
   method: "GET",
@@ -35,6 +37,14 @@ fetch(
   })
   .catch((err) => console.error(err));
 
+const btn = document.getElementById("searchBtn");
+const input = document.getElementById("search");
+
+//========================================================
+
+//========================================================
+// 렌더링
+
 // 카드 생성함수
 const makeCard = (movie) => {
   const section = document.getElementById("section");
@@ -70,7 +80,7 @@ const modalLoad = (movie) => {
   `;
 };
 
-// 모달창 열기 
+// 모달창 열기
 const openModal = (movie) => {
   const modal = document.querySelector(".modal");
   const bg = document.querySelector(".bg");
@@ -78,24 +88,12 @@ const openModal = (movie) => {
   bg.style.display = "block";
 };
 
-// 모달창 닫기
-const closeBtn = document.querySelector(".closeBtn");
-section.addEventListener("click", (e) => {
-  if (
-    e.target.classList.contains("closeBtn") ||
-    e.target.classList.contains("bg")
-  ) {
-    const modal = document.querySelector(".modal");
-    const bg = document.querySelector(".bg");
-    modal.style.top = "150%";
-    bg.style.display = "none";
-  }
-});
+//========================================================
 
-// 검색기능
-const btn = document.getElementById("searchBtn");
-const input = document.getElementById("search");
-const cards = document.getElementsByClassName("card");
+//========================================================
+// 이벤트
+
+// 검색기능 이벤트
 btn.addEventListener("click", () => searchClick());
 input.addEventListener("keyup", (e) => {
   if (e.key === "Enter") {
@@ -103,6 +101,7 @@ input.addEventListener("keyup", (e) => {
   }
 });
 const searchClick = () => {
+  const cards = document.getElementsByClassName("card");
   let text = input.value.toLowerCase();
   Array.from(cards).forEach((item) => {
     const title = item.querySelector(".title").innerHTML.toLowerCase();
@@ -117,3 +116,19 @@ const searchClick = () => {
     }
   });
 };
+
+// 모달창 닫기
+section.addEventListener("click", (e) => {
+  const closeBtn = document.querySelector(".closeBtn");
+  if (
+    e.target.classList.contains("closeBtn") ||
+    e.target.classList.contains("bg")
+  ) {
+    const modal = document.querySelector(".modal");
+    const bg = document.querySelector(".bg");
+    modal.style.top = "150%";
+    bg.style.display = "none";
+  }
+});
+
+//========================================================
